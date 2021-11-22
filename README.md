@@ -31,7 +31,7 @@ customElements.define('x-plot', Plot)
 
 ## Example
 
-<img src="demo.png">
+<p align="center"><img src="demo.png"></p>
 
 ```html
 <x-plot width="200" height="60"></x-plot>
