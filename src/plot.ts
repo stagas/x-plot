@@ -21,7 +21,7 @@ export const drawLine = ({
   zoom = 1,
   color = '#fff',
   data = [],
-  fn = i => data[i] ?? data[data.length - 1],
+  fn = i => data[i | 0] ?? data[data.length - 1],
 }: DrawLineParameters) => {
   ctx.save()
   ctx.lineWidth = lineWidth * p
@@ -37,6 +37,8 @@ export const drawLine = ({
   * 2 // we need to move two periods
   ) / Math.max(1, (data.length - 1)))
   if (!isFinite(step)) return
+  const sx = 2 / (w * p)
+  const cf = data.length / (w * p)
   let i = 0
   let cx = 0
   let cy = 0
@@ -48,8 +50,9 @@ export const drawLine = ({
   calc(fn(0))
   ctx.beginPath()
   ctx.moveTo(cx, cy)
-  for (x = -1 * zoom; x <= 1; x += step) {
-    calc(fn(i++))
+
+  for (x = -1; x <= 1; x += sx) {
+    calc(fn((i++ * cf) / zoom))
     ctx.lineTo(cx, cy)
   }
   calc(fn(i++))

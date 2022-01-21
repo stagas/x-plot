@@ -13,13 +13,15 @@ const MAX_ZOOM = 100_000
  * The `data` can only be set directly at the element instance
  * for example acquiring it through a `querySelector()`.
  */
-export interface PlotState {
+export interface HTMLPlotElement {
   /** The pixel ratio. Defaults to `window.devicePixelRatio` */
   pixelRatio: number
   /** Array-like number data to plot */
   data: number[]
   /** Zoom amount */
   zoom: number
+  /** Autoresize */
+  autoresize: boolean
   /** Line width */
   lineWidth: number
   /** Background color */
@@ -28,7 +30,31 @@ export interface PlotState {
   color: string
 }
 
-export class Plot extends HTMLElement {
+declare global {
+  interface CSSStyleSheet {
+    replaceSync(css: string): void
+  }
+  interface ShadowRoot {
+    adoptedStyleSheets: readonly CSSStyleSheet[]
+  }
+}
+
+const style = new CSSStyleSheet()
+style.replaceSync(/*css*/ `
+  :host([autoresize]) {
+    display: inline-flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  :host([autoresize]) canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+`)
+
+export class PlotElement extends HTMLElement {
   static get observedAttributes() {
     return [
       'width',
@@ -36,15 +62,17 @@ export class Plot extends HTMLElement {
       'background',
       'color',
       'zoom',
+      'autoresize',
       'pixel-ratio',
       'line-width',
     ]
   }
 
-  state: PlotState = {
+  state: HTMLPlotElement = {
     pixelRatio: window.devicePixelRatio,
     data: [] as number[],
     zoom: 1,
+    autoresize: false,
     lineWidth: 1,
     background: '#235',
     color: '#4f4',
@@ -59,19 +87,19 @@ export class Plot extends HTMLElement {
   constructor() {
     super()
 
-    this.attachShadow({ mode: 'open' })
-    this.shadowRoot!.appendChild(this.canvas)
+    const root = this.attachShadow({ mode: 'open' })
+    root.adoptedStyleSheets = [style]
+    root.appendChild(this.canvas)
     this.addEventListener(
       'wheel',
       e => {
-        const zoom =
-          +this.state.zoom -
-          Math.min(50, this.state.zoom ** 1.15) * 0.0006 * e.deltaY
+        const zoom = +this.state.zoom - Math.min(50, this.state.zoom ** 1.15) * 0.0006 * e.deltaY
 
         this.setAttribute('zoom', '' + zoom)
       },
       { passive: true }
     )
+    this.addEventListener('wheel', e => e.preventDefault(), { passive: false })
   }
 
   set data(value: number[]) {
@@ -99,14 +127,16 @@ export class Plot extends HTMLElement {
         if (!isFinite(+value)) return
         if (value < 1) value = 1
         if (value > MAX_ZOOM) value = MAX_ZOOM
-      default:
+      // eslint-disable-next-line no-fallthrough
+      default: {
         // convert kebab-case attribute to camelCase for the props
         const prop = name.replace(/-[a-z]/g, s => s[1].toUpperCase())
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ;(this.state as any)[prop] = value
+      }
     }
     this.draw()
   }
 }
 
-export default Plot
+export default PlotElement
