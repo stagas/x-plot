@@ -78,8 +78,5 @@
     "ts-node": "^10.4.0",
     "typescript": "^4.5.5",
     "vite-open": "^1.1.0"
-  },
-  "dependencies": {
-    "@stagas/vele": "file:../vele"
   }
 }
