@@ -13,7 +13,7 @@ a web component that plots zoomable waveforms
  · <a href="https://github.com/stagas/x-plot/issues">   🖐️ <strong>Help</strong></a>
 </p>
 
-***
+---
 
 ## Install
 
@@ -24,9 +24,9 @@ $ npm i x-plot
 Or directly from [jsDelivr](https://www.jsdelivr.com/):
 
 ```js
-import { Plot } from 'https://cdn.jsdelivr.net/gh/stagas/x-plot/x-plot.min.js'
+import { PlotElement } from 'https://cdn.jsdelivr.net/gh/stagas/x-plot/x-plot.min.js'
 
-customElements.define('x-plot', Plot)
+customElements.define('x-plot', PlotElement)
 ```
 
 ## Example
@@ -41,10 +41,10 @@ customElements.define('x-plot', Plot)
 ```
 
 ```js
-import { Plot } from 'x-plot'
+import { PlotElement } from 'x-plot'
 
 // any name works for the custom element, here: <x-plot>
-customElements.define('x-plot', Plot)
+customElements.define('x-plot', PlotElement)
 
 // then simply put array-like .data on the elements
 const plots = container.querySelectorAll('x-plot')
@@ -52,9 +52,15 @@ const plots = container.querySelectorAll('x-plot')
 const rate = 44100
 const sine = (i, hz) => Math.sin(hz * (i * (1 / rate)) * Math.PI * 2)
 
-plots[0].data = Array(rate).fill(0).map((_, i) => sine(i, 1))
-plots[1].data = Array(rate).fill(0).map((_, i) => sine(i, 10))
-plots[2].data = Array(rate).fill(0).map((_, i) => sine(i, 100))
+plots[0].data = Array(rate)
+  .fill(0)
+  .map((_, i) => sine(i, 1))
+plots[1].data = Array(rate)
+  .fill(0)
+  .map((_, i) => sine(i, 10))
+plots[2].data = Array(rate)
+  .fill(0)
+  .map((_, i) => sine(i, 100))
 plots[3].data = [1, 0, -1, 0, 1, 0, -1]
 ```
 
@@ -64,17 +70,17 @@ plots[3].data = [1, 0, -1, 0, 1, 0, -1]
 
 #### Table of Contents
 
-*   [PlotState](#plotstate)
-    *   [pixelRatio](#pixelratio)
-    *   [data](#data)
-    *   [zoom](#zoom)
-    *   [lineWidth](#linewidth)
-    *   [background](#background)
-    *   [color](#color)
+- [PlotState](#plotstate)
+  - [pixelRatio](#pixelratio)
+  - [data](#data)
+  - [zoom](#zoom)
+  - [lineWidth](#linewidth)
+  - [background](#background)
+  - [color](#color)
 
 ### PlotState
 
-[src/index.ts:16-29](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L16-L29 "Source code on GitHub")
+[src/index.ts:16-29](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L16-L29 'Source code on GitHub')
 
 Plot settings.
 
@@ -88,7 +94,7 @@ for example acquiring it through a `querySelector()`.
 
 #### pixelRatio
 
-[src/index.ts:18-18](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L18-L18 "Source code on GitHub")
+[src/index.ts:18-18](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L18-L18 'Source code on GitHub')
 
 The pixel ratio. Defaults to `window.devicePixelRatio`
 
@@ -96,7 +102,7 @@ Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 #### data
 
-[src/index.ts:20-20](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L20-L20 "Source code on GitHub")
+[src/index.ts:20-20](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L20-L20 'Source code on GitHub')
 
 Array-like number data to plot
 
@@ -104,7 +110,7 @@ Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global
 
 #### zoom
 
-[src/index.ts:22-22](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L22-L22 "Source code on GitHub")
+[src/index.ts:22-22](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L22-L22 'Source code on GitHub')
 
 Zoom amount
 
@@ -112,7 +118,7 @@ Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 #### lineWidth
 
-[src/index.ts:24-24](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L24-L24 "Source code on GitHub")
+[src/index.ts:24-24](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L24-L24 'Source code on GitHub')
 
 Line width
 
@@ -120,7 +126,7 @@ Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 #### background
 
-[src/index.ts:26-26](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L26-L26 "Source code on GitHub")
+[src/index.ts:26-26](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L26-L26 'Source code on GitHub')
 
 Background color
 
@@ -128,7 +134,7 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 #### color
 
-[src/index.ts:28-28](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L28-L28 "Source code on GitHub")
+[src/index.ts:28-28](https://github.com/stagas/x-plot/blob/339ada6def199a0428ce66c4bd5cac86c2dbf4fb/src/index.ts#L28-L28 'Source code on GitHub')
 
 Stroke color
 
