@@ -14,6 +14,10 @@ const MAX_ZOOM = 100_000
  * for example acquiring it through a `querySelector()`.
  */
 export interface HTMLPlotElement {
+  /** Width of plot */
+  width: number
+  /** Height of plot */
+  height: number
   /** The pixel ratio. Defaults to `window.devicePixelRatio` */
   pixelRatio: number
   /** Array-like number data to plot */
@@ -68,7 +72,7 @@ export class PlotElement extends HTMLElement {
     ]
   }
 
-  state: HTMLPlotElement = {
+  state: Partial<HTMLPlotElement> = {
     pixelRatio: window.devicePixelRatio,
     data: [] as number[],
     zoom: 1,
@@ -93,7 +97,7 @@ export class PlotElement extends HTMLElement {
     this.addEventListener(
       'wheel',
       e => {
-        const zoom = +this.state.zoom - Math.min(50, this.state.zoom ** 1.15) * 0.0006 * e.deltaY
+        const zoom = +this.state.zoom! - Math.min(50, this.state.zoom! ** 1.15) * 0.0006 * e.deltaY
 
         this.setAttribute('zoom', '' + zoom)
       },
@@ -108,7 +112,7 @@ export class PlotElement extends HTMLElement {
   }
 
   draw() {
-    this.context.fillStyle = this.state.background
+    this.context.fillStyle = this.state.background!
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
     drawLine({ context: this.context, ...this.state })
   }
@@ -116,11 +120,11 @@ export class PlotElement extends HTMLElement {
   attributeChangedCallback(name: string, _: string, value: string | number) {
     switch (name) {
       case 'width':
-        this.canvas.width = +value * this.state.pixelRatio
+        this.canvas.width = +value * this.state.pixelRatio!
         this.canvas.style.width = value + 'px'
         break
       case 'height':
-        this.canvas.height = +value * this.state.pixelRatio
+        this.canvas.height = +value * this.state.pixelRatio!
         this.canvas.style.height = value + 'px'
         break
       case 'zoom':
