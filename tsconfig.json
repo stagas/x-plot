@@ -25,6 +25,7 @@
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
     "isolatedModules": true,
     "inlineSources": true,
     "declaration": true,
