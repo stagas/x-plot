@@ -71,6 +71,8 @@ plots[3].data = [1, 0, -1, 0, 1, 0, -1]
 #### Table of Contents
 
 *   [HTMLPlotElement](#htmlplotelement)
+    *   [width](#width)
+    *   [height](#height)
     *   [pixelRatio](#pixelratio)
     *   [data](#data)
     *   [zoom](#zoom)
@@ -81,7 +83,7 @@ plots[3].data = [1, 0, -1, 0, 1, 0, -1]
 
 ### HTMLPlotElement
 
-[src/index.ts:16-31](https://github.com/stagas/x-plot/blob/ee44628f82ef104d66d92f586d1fe092c56c922c/src/index.ts#L16-L31 "Source code on GitHub")
+[src/index.ts:16-35](https://github.com/stagas/x-plot/blob/a640be5f18b0fcb72a1f4c74d00d651b0f2950d2/src/index.ts#L16-L35 "Source code on GitHub")
 
 Plot settings.
 
@@ -93,9 +95,25 @@ i.e lineWidth => line-width
 The `data` can only be set directly at the element instance
 for example acquiring it through a `querySelector()`.
 
+#### width
+
+[src/index.ts:18-18](https://github.com/stagas/x-plot/blob/a640be5f18b0fcb72a1f4c74d00d651b0f2950d2/src/index.ts#L18-L18 "Source code on GitHub")
+
+Width of plot
+
+Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)
+
+#### height
+
+[src/index.ts:20-20](https://github.com/stagas/x-plot/blob/a640be5f18b0fcb72a1f4c74d00d651b0f2950d2/src/index.ts#L20-L20 "Source code on GitHub")
+
+Height of plot
+
+Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number)
+
 #### pixelRatio
 
-[src/index.ts:18-18](https://github.com/stagas/x-plot/blob/ee44628f82ef104d66d92f586d1fe092c56c922c/src/index.ts#L18-L18 "Source code on GitHub")
+[src/index.ts:22-22](https://github.com/stagas/x-plot/blob/a640be5f18b0fcb72a1f4c74d00d651b0f2950d2/src/index.ts#L22-L22 "Source code on GitHub")
 
 The pixel ratio. Defaults to `window.devicePixelRatio`
 
@@ -103,7 +121,7 @@ Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 #### data
 
-[src/index.ts:20-20](https://github.com/stagas/x-plot/blob/ee44628f82ef104d66d92f586d1fe092c56c922c/src/index.ts#L20-L20 "Source code on GitHub")
+[src/index.ts:24-24](https://github.com/stagas/x-plot/blob/a640be5f18b0fcb72a1f4c74d00d651b0f2950d2/src/index.ts#L24-L24 "Source code on GitHub")
 
 Array-like number data to plot
 
@@ -111,7 +129,7 @@ Type: [Array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global
 
 #### zoom
 
-[src/index.ts:22-22](https://github.com/stagas/x-plot/blob/ee44628f82ef104d66d92f586d1fe092c56c922c/src/index.ts#L22-L22 "Source code on GitHub")
+[src/index.ts:26-26](https://github.com/stagas/x-plot/blob/a640be5f18b0fcb72a1f4c74d00d651b0f2950d2/src/index.ts#L26-L26 "Source code on GitHub")
 
 Zoom amount
 
@@ -119,7 +137,7 @@ Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 #### autoresize
 
-[src/index.ts:24-24](https://github.com/stagas/x-plot/blob/ee44628f82ef104d66d92f586d1fe092c56c922c/src/index.ts#L24-L24 "Source code on GitHub")
+[src/index.ts:28-28](https://github.com/stagas/x-plot/blob/a640be5f18b0fcb72a1f4c74d00d651b0f2950d2/src/index.ts#L28-L28 "Source code on GitHub")
 
 Autoresize
 
@@ -127,7 +145,7 @@ Type: [boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Glob
 
 #### lineWidth
 
-[src/index.ts:26-26](https://github.com/stagas/x-plot/blob/ee44628f82ef104d66d92f586d1fe092c56c922c/src/index.ts#L26-L26 "Source code on GitHub")
+[src/index.ts:30-30](https://github.com/stagas/x-plot/blob/a640be5f18b0fcb72a1f4c74d00d651b0f2950d2/src/index.ts#L30-L30 "Source code on GitHub")
 
 Line width
 
@@ -135,7 +153,7 @@ Type: [number](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 #### background
 
-[src/index.ts:28-28](https://github.com/stagas/x-plot/blob/ee44628f82ef104d66d92f586d1fe092c56c922c/src/index.ts#L28-L28 "Source code on GitHub")
+[src/index.ts:32-32](https://github.com/stagas/x-plot/blob/a640be5f18b0fcb72a1f4c74d00d651b0f2950d2/src/index.ts#L32-L32 "Source code on GitHub")
 
 Background color
 
@@ -143,7 +161,7 @@ Type: [string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Globa
 
 #### color
 
-[src/index.ts:30-30](https://github.com/stagas/x-plot/blob/ee44628f82ef104d66d92f586d1fe092c56c922c/src/index.ts#L30-L30 "Source code on GitHub")
+[src/index.ts:34-34](https://github.com/stagas/x-plot/blob/a640be5f18b0fcb72a1f4c74d00d651b0f2950d2/src/index.ts#L34-L34 "Source code on GitHub")
 
 Stroke color
 
