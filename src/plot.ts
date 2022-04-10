@@ -3,12 +3,13 @@ interface DrawLineParameters {
   width?: number
   height?: number
   pixelRatio?: number
+  offsetX?: number
   lineWidth?: number
   composite?: string
   dashes?: number[]
   zoom?: number
   color?: string
-  data?: number[]
+  data?: ArrayLike<number>
   fn?: (x: number) => number
 }
 
@@ -17,19 +18,23 @@ export const drawLine = ({
   width: w = ctx.canvas.width,
   height = ctx.canvas.height,
   pixelRatio: p = window.devicePixelRatio,
+  offsetX: ox = 50,
   lineWidth = 1,
   zoom = 1,
   color = '#fff',
   data = [],
   fn = i => data[i | 0] ?? data[data.length - 1],
 }: DrawLineParameters) => {
+  ox /= 100
+  w *= p
+  height *= p
   ctx.save()
   ctx.lineWidth = lineWidth * p
   ctx.lineJoin = 'round'
   ctx.strokeStyle = color
   const k = lineWidth * p + p
   const hk = k * 0.5
-  const hw = w * 0.5 + hk * 0.75
+  const hw = w * 0.5 + hk
   const h = height - k
   // prettier-ignore
   const step = Math.max(0.00001, (
@@ -38,11 +43,15 @@ export const drawLine = ({
   ) / Math.max(1, (data.length - 1)))
   if (!isFinite(step)) return
   const sx = 2 / (w * p)
-  const cf = data.length / (w * p)
-  let i = 0
+  const cf = data.length / (w * p * zoom)
+
+  // panning
+  const ds = cf * w * p
+  let i = ((data.length - ds) / cf) * ox
+
   let cx = 0
   let cy = 0
-  let x = -1 * zoom
+  let x = -1
   const calc = (y: number) => {
     cx = (x + 1) * hw - hk
     cy = (1 - (y + 1) * 0.5) * h + hk
@@ -52,10 +61,10 @@ export const drawLine = ({
   ctx.moveTo(cx, cy)
 
   for (x = -1; x <= 1; x += sx) {
-    calc(fn((i++ * cf) / zoom))
+    calc(fn(i++ * cf))
     ctx.lineTo(cx, cy)
   }
-  calc(fn(i++))
+  calc(fn(i++ * cf))
   ctx.lineTo(cx, cy)
   ctx.lineTo(cx, cy)
   ctx.stroke()

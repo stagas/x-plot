@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='47.2' r='34'%0Afill='transparent' stroke='%23fff' stroke-width='7.5' /%3E%3C/svg%3E"
+      type="image/svg+xml"
+    />
+    <title>web</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        --light: #eee;
+        --dark: #222;
+        --color: var(--dark);
+        --background: var(--light);
+        color: var(--color);
+        background: var(--background)
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body:not(.light) {
+          --color: var(--light);
+          --background: var(--dark);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main></main>
+    <script type="module">const FluentFlags = (cb, flags = {})=>new Proxy(cb, {
+        get (_, prop, receiver) {
+            flags[prop] = true;
+            return receiver;
+        },
+        apply (_, self, args) {
+            const f = {
+                ...flags
+            };
+            flags = {}
+            ;
+            return cb.call(self, f).apply(self, args);
+        }
+    })
+;
+
+const event = ()=>FluentFlags((flags)=>(fn = ()=>{})=>function(event1) {
+                if (flags.prevent) event1.preventDefault();
+                if (flags.stop) flags.immediate ? event1.stopImmediatePropagation() : event1.stopPropagation();
+                return fn.call(this, event1);
+            }
+    )
+;
+
+function onEvent(el, type, listener, options) {
+    el.addEventListener(type, listener, options);
+    return ()=>off(el, type, listener, options)
+    ;
+}
+ const on = ()=>FluentFlags((flags)=>(el, type, fn, options = {})=>onEvent(el, type, fn, {
+                ...flags.active ? {
+                    passive: false
+                } : null,
+                ...flags,
+                ...options
+            })
+    )
+;
+ const off = (el, type, listener, options)=>el.removeEventListener(type, listener, options)
+;
+
+const accessors = (target, source, fn)=>Object.defineProperties(target, Object.fromEntries(Object.entries(source).map(([key, value])=>{
+        const next = fn(key, value);
+        const prev = Object.getOwnPropertyDescriptor(target, key);
+        if (prev && prev.get && prev.set) {
+            const { get , set  } = next;
+            next.get = ()=>prev.get?.() ?? get()
+            ;
+            next.set = (v)=>{
+                prev.set?.(v);
+                set(prev.get?.() ?? v);
+            };
+        }
+        return [
+            key,
+            {
+                configurable: true,
+                enumerable: true,
+                ...next
+            }
+        ];
+    })))
+;
+
+const Types = new Map([
+    [
+        String,
+        (x)=>x.toString()
+    ],
+    [
+        Number,
+        (x)=>parseFloat(x)
+    ],
+    [
+        Boolean,
+        (x)=>x = x === false ? false : x != null
+    ],
+]);
+const applyProps = (self, data)=>{
+    for (const [key1, value1] of Object.entries(data))if ([
+        String,
+        Number,
+        Boolean
+    ].includes(value1)) data[key1] = void 0;
+    accessors(self, data, (key)=>{
+        const attr = key.toLowerCase();
+        return {
+            get: ()=>data[key]
+            ,
+            set (value) {
+                self.setAttribute(attr, value);
+            }
+        };
+    });
+    return data;
+};
+const attrs = (attrs1)=>(superclass)=>{
+        const types = new Map();
+        const map = new Map();
+        for (const [key2, value] of Object.entries(new attrs1())){
+            const type = value == null ? Types.get(String) : Types.get(value) ?? Types.get(value?.constructor);
+            if (!type) {
+                throw new TypeError(`Attribute "${key2}" is not valid type, must be either: String, Number, Boolean, null, undefined`);
+            }
+            types.set(key2, type);
+            map.set(key2.toLowerCase(), key2);
+        }
+        const observedAttributes = [
+            ...map.keys()
+        ];
+        return class extends superclass {
+            static get observedAttributes() {
+                return observedAttributes.concat(super.observedAttributes ?? []);
+            }
+            #data;
+            constructor(...args){
+                super(...args);
+                this.#data = applyProps(this, new attrs1());
+            }
+            attributeChangedCallback(name, oldValue, newValue) {
+                let key;
+                if (key = map.get(name)) {
+                    const prev = this.#data[key];
+                    const next = types.get(key)(newValue);
+                    if (!Object.is(prev, next)) {
+                        this.#data[key] = next;
+                        this.propertyChangedCallback?.(key, prev, next);
+                    }
+                }
+                super.attributeChangedCallback?.(name, oldValue, newValue);
+            }
+        };
+    }
+;
+
+const Listener = (body)=>new Function('event', `with(this){let fn=${body};return typeof fn=='function'?fn.call(this,event):fn}`)
+;
+const events = ()=>(superclass)=>superclass.prototype.dispatch
+         ? superclass : class extends superclass {
+            dispatchEvent(event) {
+                const onEvent = `on${event.type}`;
+                let fn = this[onEvent];
+                if (!fn) fn = Listener(this.getAttribute(onEvent));
+                const pass = fn.call(this, event);
+                if (pass !== false) super.dispatchEvent(event);
+                return pass;
+            }
+            dispatch(name, detail, init) {
+                return this.dispatchEvent(new CustomEvent(name, {
+                    detail,
+                    ...init
+                }));
+            }
+        }
+;
+
+const lifecycle = ()=>(superclass)=>class extends mixter(superclass, events()) {
+            isMounted = false;
+            connectedCallback() {
+                super.connectedCallback?.();
+                if (!this.isMounted) {
+                    this.isMounted = true;
+                    this.dispatch('mounted');
+                }
+            }
+            disconnectedCallback() {
+                super.disconnectedCallback?.();
+                queueMicrotask(()=>{
+                    if (!this.isConnected) {
+                        this.isMounted = false;
+                        this.dispatch('unmounted');
+                    }
+                });
+            }
+        }
+;
+
+const props = (props1)=>(superclass)=>class extends superclass {
+            constructor(...args){
+                super(...args);
+                Object.assign(this, new props1());
+            }
+        }
+;
+
+const shadow = (init = '', html = '')=>(superclass)=>class extends superclass {
+            root = (()=>{
+                const root = this.attachShadow(typeof init === 'object' ? init : {
+                    mode: 'open'
+                });
+                root.innerHTML = typeof init === 'string' ? init : html;
+                return root;
+            })();
+        }
+;
+
+const argsOf = (x1)=>{
+    const d = x1.indexOf('{') + 1;
+    if (!d || x1.slice(0, d).includes(')')) return [];
+    x1 = x1.slice(d);
+    let match;
+    do {
+        match = false;
+        x1 = x1.replace(/`((\\`)?[^`])+?`|'((\\')?[^'])+?'|"((\\")?[^"])+?"|\([^{[(]*?\)|\{[^{[(]*?\}|\[[^{[(]*?\]/g, ()=>{
+            match = true;
+            return '';
+        });
+    }while (match)
+    return x1.split('}')[0].split(',').map((x)=>x.split(/[^\w\s$]+/g)[0].trim()
+    );
+};
+ const argtor = (fn, keys = new Set())=>(argsOf('' + fn).forEach((x)=>!x || keys.add(x)
+    ), keys)
+;
+
+const create = (target)=>{
+    const NO_DEPS = Symbol();
+    const REDUCER = Symbol();
+    const entries = Object.entries(target);
+    const mem = Object.fromEntries(entries);
+    const register = (f)=>{
+        f.keys = argtor(f.fn);
+        f.keys.forEach((key)=>effects.get(key).push(f)
+        );
+        !f.keys.size && effects.get(NO_DEPS).push(f);
+        f.values = {};
+        return run(f);
+    };
+    const update = (f)=>{
+        f.pass = !f.keys.size;
+        for (const key of f.keys){
+            const value = target[key];
+            if (value == null) {
+                f.pass = false;
+                return;
+            }
+            if (!Object.is(f.values[key], value)) {
+                f.values[key] = value;
+                f.pass = true;
+            }
+        }
+    };
+    const run = (f)=>{
+        update(f);
+        f.dispose?.();
+        if (!f.pass) return;
+        const result = f.fn(f.values);
+        if (f.cb?.(result) === false) return;
+        if (f.target != null) target[f.target] = result;
+        else {
+            if (typeof result === 'function') {
+                f.dispose = ()=>{
+                    result();
+                    f.dispose = null;
+                };
+            }
+        }
+    };
+    const context = {
+        $: {}
+    };
+    const $ = context.$;
+    $.$ = $;
+    accessors(context.$, target, (key)=>({
+            get: ()=>mem[key]
+            ,
+            set (v) {
+                if (v === REDUCER) {
+                    v = reducer.initial;
+                    reducer.target = key;
+                    register(reducer);
+                    if (v == null) return;
+                }
+                target[key] = v;
+            }
+        })
+    );
+    accessors(target, target, (key)=>({
+            get: ()=>mem[key]
+            ,
+            set (v) {
+                if (!Object.is(mem[key], v)) {
+                    mem[key] = v;
+                    effects.get(key).forEach(run);
+                }
+            }
+        })
+    );
+    let reducer;
+    $.reduce = (fn, initial)=>{
+        reducer = {
+            fn,
+            initial
+        };
+        return REDUCER;
+    };
+    $.effect = (fn, cb)=>register({
+            fn,
+            cb
+        })
+    ;
+    let effects;
+    $.cleanup = ()=>{
+        if (effects) {
+            for (const fns of effects.values())fns.forEach((f)=>f.dispose?.()
+            );
+        }
+        effects = new Map([
+            [
+                NO_DEPS,
+                []
+            ],
+            ...entries.map(([key])=>[
+                    key,
+                    []
+                ]
+            ),
+        ]);
+    };
+    $.cleanup();
+    return $;
+};
+const state = (fn)=>(superclass)=>class extends mixter(superclass, lifecycle()) {
+            host = this;
+            constructor(...args){
+                super(...args);
+                const context = create(this);
+                on()(this, 'mounted', ()=>fn.call(this, context)
+                );
+                on()(this, 'unmounted', context.cleanup);
+            }
+        }
+;
+
+function mixter(a, ...mixins) {
+    return mixins.reduce((c, mixin)=>mixin(c)
+    , a);
+}
+
+const MAX_ZOOM = 100_000;
+const style = /*css*/ `
+:host {
+  display: inline-flex;
+  outline: none;
+  user-select: none;
+  touch-action: none;
+}
+
+:host([autoresize]) {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+:host([autoresize]) canvas {
+  width: 100% !important;
+  height: 100% !important;
+}`;
+/**
+ * Plot.
+ */
+class PlotElement extends mixter(HTMLElement, shadow(`<style>${style}</style><canvas></canvas>`), attrs(class {
+    width = 200;
+    height = 60;
+    lineWidth = 1;
+    pixelRatio = window.devicePixelRatio;
+    background = '#235';
+    color = '#4f4';
+    /** Autoresize to fit parent element's size. */
+    autoResize = false;
+    /** Zoom scale: `1`=no zoom. */
+    zoom = 1;
+    /** Horizontal panning position. */
+    offsetX = 0;
+}), props(class {
+    /** Array-like number data to plot, range `-1..+1`, `0`=center, `-1`=bottom, `+1`=top. */
+    data;
+    /** @private */
+    screen;
+    /** @private */
+    onPointerMove;
+    /** @private */
+    onWheel;
+    /** @private */
+    get;
+    /** Pointer down state
+     * @private
+     */
+    pointerDown = false;
+    /** Pointer data
+     * @private
+     */
+    pointer = {
+        id: -1,
+        x: 0,
+        y: 0,
+    };
+}), state(function ({ $, effect, reduce }) {
+    if (this.tabIndex === -1)
+        this.tabIndex = 0;
+    $.screen = reduce(({ root }) => {
+        const canvas = root.querySelector('canvas');
+        const ctx = canvas.getContext('2d', {
+            alpha: false,
+            desynchronized: true,
+        });
+        return { canvas, ctx };
+    });
+    $.get = reduce(({ data }) => (i) => data[i | 0] ?? data[data.length - 1]);
+    effect(({ zoom }) => {
+        $.zoom = Math.max(1, Math.min(MAX_ZOOM, zoom));
+    });
+    effect(({ screen: { canvas }, width, height, pixelRatio }) => {
+        canvas.width = width * pixelRatio;
+        canvas.height = height * pixelRatio;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+    });
+    effect(({ screen: { ctx }, lineWidth, pixelRatio, color }) => {
+        ctx.lineWidth = lineWidth * pixelRatio;
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = color;
+    });
+    effect(({ background, get, screen: { canvas, ctx }, width: w, height, pixelRatio: p, offsetX: ox, zoom, data }) => {
+        ctx.fillStyle = background;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
+        // TODO: this routine def. can be improved
+        ox /= 100;
+        w *= p;
+        height *= p;
+        const l = ctx.lineWidth;
+        const hl = l * 0.5;
+        const hw = w * 0.5 + hl;
+        const h = height - l;
+        const step = Math.max(0.00001, 
+        // * 2 because we need to move two periods
+        (zoom * 2) / Math.max(1, data.length - 1));
+        if (!isFinite(step))
+            return;
+        const sx = 1 / w;
+        const cf = data.length / (w * zoom * 2);
+        // panning
+        const ds = cf * w * 2;
+        let i = ((data.length - ds) / cf) * ox;
+        let cx = 0;
+        let cy = 0;
+        let x = -1;
+        const calc = (y) => {
+            cx = (x + 1) * hw - hl;
+            cy = (1 - (y + 1) * 0.5) * h + hl;
+        };
+        calc(get(0));
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        for (x = -1; x <= 1; x += sx) {
+            calc(get(i++ * cf));
+            ctx.lineTo(cx, cy);
+        }
+        calc(get(i++ * cf));
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(cx, cy);
+        ctx.stroke();
+    });
+    $.onPointerMove = reduce(({ offsetX, pointer, zoom, pixelRatio }) => (e) => {
+        if (e.pointerId !== pointer.id)
+            return;
+        const x = e.pageX;
+        const y = e.pageY;
+        // panning
+        $.offsetX = Math.min(100, Math.max(0, offsetX + (pointer.x - x) / zoom / pixelRatio));
+        // zooming
+        const d = pointer.y - y;
+        $.zoom = zoom - Math.min(50, zoom ** 1.5) * 0.015 * d;
+        $.pointer = { id: e.pointerId, x, y };
+    });
+    $.onWheel = reduce(({ zoom }) => (e) => {
+        $.zoom = zoom - Math.min(50, zoom ** 1.15) * 0.0006 * e.deltaY;
+    });
+    const onPointerDown = (e) => {
+        $.pointer = { id: e.pointerId, x: e.pageX, y: e.pageY };
+        $.pointerDown = true;
+    };
+    effect(({ pointerDown, onPointerMove }) => {
+        if (!pointerDown)
+            return;
+        const off = on()(window, 'pointermove', event().prevent.stop(onPointerMove));
+        const offOnce = on().once(window, 'pointerup', () => {
+            $.pointerDown = false;
+        });
+        return () => {
+            off();
+            offOnce();
+        };
+    });
+    effect(({ onWheel }) => {
+        const offPointerDown = on()(this, 'pointerdown', onPointerDown);
+        // TODO: add prop zoomable ? zoomOnFocus or zoom.type = 'onfocus' | 'always' | 'never', zoom.amount ..
+        const offWheel = on().active(this, 'wheel', onWheel);
+        return () => {
+            offPointerDown();
+            offWheel();
+        };
+    });
+})) {
+}
+
+customElements.define('x-plot', PlotElement);
+const plot = new PlotElement();
+plot.id = 'demo';
+document.body.appendChild(plot);
+let n = 0;
+const sine = (i, hz) => Math.sin(hz * (i * (1 / 1000)) * Math.PI * 2);
+const loop = () => {
+    requestAnimationFrame(loop);
+    plot.data = Array(1000).fill(0).map(_ => sine(++n, 4));
+    n += 1000 / 4 / 60; // sampleRate/hz/frameRate to loop video capture every 1 second
+};
+loop();
+</script>
+  </body>
+</html>
