@@ -37,10 +37,13 @@ export const drawLine = ({
   const hw = w * 0.5 + hk
   const h = height - k
   // prettier-ignore
-  const step = Math.max(0.00001, (
-    zoom
-  * 2 // we need to move two periods
-  ) / Math.max(1, (data.length - 1)))
+  const step = Math.max(
+    0.00001,
+    (
+      zoom
+      * 2 // we need to move two periods
+    ) / Math.max(1, data.length - 1)
+  )
   if (!isFinite(step)) return
   const sx = 2 / (w * p)
   const cf = data.length / (w * p * zoom)
