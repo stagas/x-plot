@@ -1,5 +1,5 @@
 <h1>
-x-plot <a href="https://npmjs.org/package/x-plot"><img src="https://img.shields.io/badge/npm-v2.0.0-F00.svg?colorA=000"/></a> <a href="src"><img src="https://img.shields.io/badge/loc-228-FFF.svg?colorA=000"/></a> <a href="https://cdn.jsdelivr.net/npm/x-plot@2.0.0/dist/x-plot.min.js"><img src="https://img.shields.io/badge/brotli-2.7K-333.svg?colorA=000"/></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-F0B.svg?colorA=000"/></a>
+x-plot <a href="https://npmjs.org/package/x-plot"><img src="https://img.shields.io/badge/npm-v2.0.1-F00.svg?colorA=000"/></a> <a href="src"><img src="https://img.shields.io/badge/loc-228-FFF.svg?colorA=000"/></a> <a href="https://cdn.jsdelivr.net/npm/x-plot@2.0.1/dist/x-plot.min.js"><img src="https://img.shields.io/badge/brotli-2.7K-333.svg?colorA=000"/></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-F0B.svg?colorA=000"/></a>
 </h1>
 
 <p></p>
