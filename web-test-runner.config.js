@@ -1,15 +1,11 @@
 const { chromeLauncher, summaryReporter } = require('@web/test-runner')
-const { fromRollup } = require('@web/dev-server-rollup')
-const rollupCommonjs = require('@rollup/plugin-commonjs')
-const vite = require('vite-web-test-runner-plugin')
-
-const commonjs = fromRollup(rollupCommonjs)
+const { vite } = require('wtr-plugin-vite')
 
 module.exports = {
   concurrency: 1,
   nodeResolve: true,
   files: ['test/**/*.spec.web.{ts,tsx}'],
-  plugins: [vite(), commonjs()],
+  plugins: [vite()],
   browsers: [chromeLauncher({
     launchOptions: {
       args: [

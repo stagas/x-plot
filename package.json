@@ -53,28 +53,28 @@
     "prepack": "npm run clean && npm run build && (npm run build:dist || echo unable to bundle)",
     "prepack:dry": "npm pack --dry-run",
     "prepush": "npm run lint && npm run test",
-    "prepare": "husky install && node .pull-configs.js"
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@n1kk/intspector": "1.0.2",
-    "@rollup/plugin-commonjs": "21.0.3",
     "@stagas/jest-node-exports-resolver": "1.1.5-require-basedir-2",
     "@swc-node/jest": "1.4.3",
-    "@swc/cli": "0.1.56",
-    "@swc/core": "1.2.160",
+    "@swc/cli": "0.1.57",
+    "@swc/core": "1.2.164",
     "@tsconfig/node16": "1.0.2",
+    "@types/audioworklet": "0.0.26",
     "@types/jest": "27.4.1",
     "@types/node": "17.0.23",
-    "@typescript-eslint/eslint-plugin": "5.16.0",
-    "@typescript-eslint/parser": "5.16.0",
-    "@web/dev-server-rollup": "0.3.15",
+    "@types/webmidi": "2.0.6",
+    "@typescript-eslint/eslint-plugin": "5.18.0",
+    "@typescript-eslint/parser": "5.18.0",
     "@web/test-runner": "0.13.27",
     "bunzee": "^0.0.1",
     "chokidar": "3.5.3",
-    "dprint": "0.24.1",
-    "eslint": "8.12.0",
+    "dprint": "0.24.4",
+    "eslint": "8.13.0",
     "eslint-config-html-jsx": "1.0.0",
-    "eslint-plugin-import": "2.25.4",
+    "eslint-plugin-import": "2.26.0",
     "husky": "7.0.4",
     "jest": "27.5.1",
     "jest-browser-globals": "25.1.0-beta",
@@ -82,15 +82,14 @@
     "pull-configs": "^0.2.0",
     "rimraf": "3.0.2",
     "swcno": "0.1.1",
-    "terser": "5.12.1",
     "ts-jest": "27.1.4",
     "ts-node": "10.7.0",
     "typescript": "4.6.3",
-    "vite-open": "^1.4.2",
-    "vite-web-test-runner-plugin": "0.1.0"
+    "vite-open": "^1.6.2",
+    "wtr-plugin-vite": "^0.0.1"
   },
   "dependencies": {
-    "mixter": "^0.0.1"
+    "mixter": "^0.3.1"
   },
   "trustedDependencies": [
     "@stagas/jest-node-exports-resolver",
@@ -101,9 +100,10 @@
     "fluent-flags",
     "html-jsx",
     "html-vdom",
-    "pull-configs",
     "mixter",
-    "vite-open"
+    "pull-configs",
+    "vite-open",
+    "wtr-plugin-vite"
   ],
   "types": "./dist/types/index.d.ts"
 }
