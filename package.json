@@ -3,7 +3,7 @@
   "author": "stagas",
   "short": "stagas/x-plot",
   "description": "A Web Component that plots zoomable and pannable waveforms.",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "license": "MIT",
   "repository": {
     "type": "git",
