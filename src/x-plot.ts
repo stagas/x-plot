@@ -26,7 +26,8 @@ export interface PlotElement extends $.Element<PlotElement> {}
 /**
  * Plot.
  */
-@$.element() export class PlotElement extends HTMLElement {
+@$.element()
+export class PlotElement extends HTMLElement {
   root = $.shadow(this, /*html*/ `<style>${style}</style><canvas></canvas>`)
 
   @$.attr() width = 200
